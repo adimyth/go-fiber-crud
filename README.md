@@ -1,10 +1,6 @@
 # Go Fiber CRUD App
 
----
-
 ## CRUD App
-
----
 
 A simple todo crud app.
 
@@ -21,15 +17,11 @@ A simple todo crud app.
 
 ## Dependencies
 
----
-
 1. [Go Fiber](https://gofiber.io) - An Express-inspired web framework written in Go.
 2. [Mongo Models](https://github.com/Kamva/mgm) - Mongo Go Models (mgm) is a fast and simple MongoDB ODM for Go (based on official Mongo Go Driver)
 3. [Air](https://github.com/cosmtrek/air) - Live reload for Go apps. Equivalent to `nodmeon` in Node.js
 
 ## Running the App
-
----
 
 1. Clone the repository
 2. Install required dependencies for the app & Air
@@ -43,8 +35,6 @@ A simple todo crud app.
     ```
 
 ## DB Setup
-
----
 
 1. Install mongodb community version
 2. Start mongodb
