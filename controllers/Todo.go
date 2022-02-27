@@ -16,9 +16,10 @@ import (
 // @Summary      Get all todos
 // @Description  Get all todos
 // @Tags         crud todos
-// @Accept       */*
+// @Accept       json
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Success      200  {array}  schema.ToDo
+// @Failed	   500  {object}  map[string]interface{}
 // @Router       /todos [get]
 func GetAllTodos(ctx *fiber.Ctx) error {
 	// Access the collection
@@ -45,9 +46,11 @@ func GetAllTodos(ctx *fiber.Ctx) error {
 // @Summary      Get todo by id
 // @Description  Get todo by id
 // @Tags         crud todos
-// @Accept       */*
+// @Accept       json
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param		id path string true "Todo ID"
+// @Success      200  {object}  schema.ToDo
+// @Failed	   404  {object}  map[string]interface{}
 // @Router       /todos/:id [get]
 func GetTodoByID(ctx *fiber.Ctx) error {
 	collection := mgm.Coll(&models.ToDo{})
@@ -70,8 +73,9 @@ func GetTodoByID(ctx *fiber.Ctx) error {
 // @Summary      Create a todo
 // @Description  Create a todo. Provide title & description
 // @Tags         crud todos
-// @Accept       */*
+// @Accept       json
 // @Produce      json
+// @BODY		  {object}  schema.ToDo
 // @Success      200  {object}  map[string]interface{}
 // @Router       /todos [post]
 func CreateTodo(ctx *fiber.Ctx) error {
@@ -117,9 +121,11 @@ func CreateTodo(ctx *fiber.Ctx) error {
 // @Summary      Update a todo
 // @Description  Update a todo. Provide title, description & id
 // @Tags         crud todos
-// @Accept       */*
+// @Accept       json
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Param		id path string true "Todo ID"
+// @BODY		  {object}  schema.ToDo
+// @Success      200  {object}  schema.ToDo
 // @Router       /todos/:id [patch]
 func UpdateTodo(ctx *fiber.Ctx) error {
 	// Extract id from params
@@ -178,8 +184,9 @@ func UpdateTodo(ctx *fiber.Ctx) error {
 // @Summary      Delete a todo
 // @Description  Provide an id to delete a todo
 // @Tags         crud todos
-// @Accept       */*
+// @Accept       json
 // @Produce      json
+// @Param		id path string true "Todo ID"
 // @Success      200  {object}  map[string]interface{}
 // @Router       /todos/:id [delete]
 func DeleteTodo(ctx *fiber.Ctx) error {
@@ -218,8 +225,10 @@ func DeleteTodo(ctx *fiber.Ctx) error {
 // @Summary      Middlewares Chaining demonstration
 // @Description  Middleware chaining
 // @Tags         verification
-// @Accept       */*
+// @Accept       json
 // @Produce      json
+// @Param		status path string true "authenticated / not authenticated"
+// @Param		role path string true "admin / user / guest"
 // @Success      200  {object}  map[string]interface{}
 // @Router       /verify/:status/:role [get]
 func StatusVerification(c *fiber.Ctx) error {
@@ -234,7 +243,7 @@ func StatusVerification(c *fiber.Ctx) error {
 // @Summary      Show the status of server.
 // @Description  Get the status of server.
 // @Tags         healthcheck
-// @Accept       */*
+// @Accept       json
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Router       / [get]

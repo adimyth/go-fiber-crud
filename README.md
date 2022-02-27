@@ -111,7 +111,11 @@ go install github.com/swaggo/swag/cmd/swag@latest
    ```bash
    swag fmt
    ```
-4. Add documentation for each endpoint.
+4. Download fiber-swagger
+   ```bash
+   go get github.com/arsmn/fiber-swagger
+   ```
+5. Add documentation for each endpoint.
 
    ```go
     // HealthCheck godoc
@@ -129,7 +133,31 @@ go install github.com/swaggo/swag/cmd/swag@latest
 
    Refer controllers for more examples
 
-5. Open swagger documentation in browser - [swagger docs](http://localhost:3000/swagger)
+6. Add `swagger` endpoint in list of routes
+
+```go
+// main.go
+package main
+
+import (
+  swagger "github.com/arsmn/fiber-swagger/v2"
+  "github.com/gofiber/fiber/v2"
+  // replace below with ur own docs
+  _ "github.com/adimyth/go-fiber-crud/docs"
+)
+
+func main() {
+	app := fiber.New()
+
+	app.Get("/swagger/*", swagger.HandlerDefault) // default
+  ...
+	app.Listen(":3000")
+}
+```
+
+7. Open swagger documentation in browser - [swagger docs](http://localhost:3000/swagger)
+
+
 
 ## DB Setup
 

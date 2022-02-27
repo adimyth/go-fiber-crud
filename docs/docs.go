@@ -29,7 +29,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get the status of server.",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -53,7 +53,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get all todos",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -66,8 +66,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schema.ToDo"
+                            }
                         }
                     }
                 }
@@ -75,7 +77,7 @@ const docTemplate = `{
             "post": {
                 "description": "Create a todo. Provide title \u0026 description",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -99,7 +101,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get todo by id",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -108,12 +110,20 @@ const docTemplate = `{
                     "crud todos"
                 ],
                 "summary": "Get todo by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/schema.ToDo"
                         }
                     }
                 }
@@ -121,7 +131,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Provide an id to delete a todo",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -130,6 +140,15 @@ const docTemplate = `{
                     "crud todos"
                 ],
                 "summary": "Delete a todo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -143,7 +162,7 @@ const docTemplate = `{
             "patch": {
                 "description": "Update a todo. Provide title, description \u0026 id",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -152,6 +171,54 @@ const docTemplate = `{
                     "crud todos"
                 ],
                 "summary": "Update a todo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.ToDo"
+                        }
+                    }
+                }
+            }
+        },
+        "/verify/:status/:role": {
+            "get": {
+                "description": "Middleware chaining",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "verification"
+                ],
+                "summary": "Middlewares Chaining demonstration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authenticated / not authenticated",
+                        "name": "status",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "admin / user / guest",
+                        "name": "role",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -162,28 +229,28 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/verify/:status/:role": {
-            "get": {
-                "description": "Middleware chaining",
-                "consumes": [
-                    "*/*"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "verification"
-                ],
-                "summary": "Middlewares Chaining demonstration",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
+        }
+    },
+    "definitions": {
+        "schema.ToDo": {
+            "type": "object",
+            "required": [
+                "description",
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "minLength": 3
+                },
+                "done": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 3
                 }
             }
         }

@@ -1,4 +1,21 @@
 basePath: /
+definitions:
+  schema.ToDo:
+    properties:
+      description:
+        maxLength: 256
+        minLength: 3
+        type: string
+      done:
+        type: boolean
+      title:
+        maxLength: 32
+        minLength: 3
+        type: string
+    required:
+    - description
+    - title
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -16,7 +33,7 @@ paths:
   /:
     get:
       consumes:
-      - '*/*'
+      - application/json
       description: Get the status of server.
       produces:
       - application/json
@@ -32,7 +49,7 @@ paths:
   /todos:
     get:
       consumes:
-      - '*/*'
+      - application/json
       description: Get all todos
       produces:
       - application/json
@@ -40,14 +57,15 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            items:
+              $ref: '#/definitions/schema.ToDo'
+            type: array
       summary: Get all todos
       tags:
       - crud todos
     post:
       consumes:
-      - '*/*'
+      - application/json
       description: Create a todo. Provide title & description
       produces:
       - application/json
@@ -63,8 +81,14 @@ paths:
   /todos/:id:
     delete:
       consumes:
-      - '*/*'
+      - application/json
       description: Provide an id to delete a todo
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -78,39 +102,60 @@ paths:
       - crud todos
     get:
       consumes:
-      - '*/*'
+      - application/json
       description: Get todo by id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schema.ToDo'
       summary: Get todo by id
       tags:
       - crud todos
     patch:
       consumes:
-      - '*/*'
+      - application/json
       description: Update a todo. Provide title, description & id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schema.ToDo'
       summary: Update a todo
       tags:
       - crud todos
   /verify/:status/:role:
     get:
       consumes:
-      - '*/*'
+      - application/json
       description: Middleware chaining
+      parameters:
+      - description: authenticated / not authenticated
+        in: path
+        name: status
+        required: true
+        type: string
+      - description: admin / user / guest
+        in: path
+        name: role
+        required: true
+        type: string
       produces:
       - application/json
       responses:
