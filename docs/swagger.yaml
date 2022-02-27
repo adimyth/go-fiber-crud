@@ -1,0 +1,127 @@
+basePath: /
+host: localhost:3000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Fiber Swagger Example API
+  version: "2.0"
+paths:
+  /:
+    get:
+      consumes:
+      - '*/*'
+      description: Get the status of server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Show the status of server.
+      tags:
+      - healthcheck
+  /todos:
+    get:
+      consumes:
+      - '*/*'
+      description: Get all todos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all todos
+      tags:
+      - crud todos
+    post:
+      consumes:
+      - '*/*'
+      description: Create a todo. Provide title & description
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a todo
+      tags:
+      - crud todos
+  /todos/:id:
+    delete:
+      consumes:
+      - '*/*'
+      description: Provide an id to delete a todo
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a todo
+      tags:
+      - crud todos
+    get:
+      consumes:
+      - '*/*'
+      description: Get todo by id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get todo by id
+      tags:
+      - crud todos
+    patch:
+      consumes:
+      - '*/*'
+      description: Update a todo. Provide title, description & id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a todo
+      tags:
+      - crud todos
+  /verify/:status/:role:
+    get:
+      consumes:
+      - '*/*'
+      description: Middleware chaining
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Middlewares Chaining demonstration
+      tags:
+      - verification
+schemes:
+- http
+swagger: "2.0"

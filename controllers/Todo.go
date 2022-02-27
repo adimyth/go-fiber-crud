@@ -1,13 +1,26 @@
 package controllers
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/Kamva/mgm/v2"
 	"github.com/adimyth/go-fiber-crud/models"
-	"github.com/gofiber/fiber"
+	"github.com/adimyth/go-fiber-crud/schema"
+	"github.com/adimyth/go-fiber-crud/utils"
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func GetAllTodos(ctx *fiber.Ctx) {
+// GetAllTodos godoc
+// @Summary      Get all todos
+// @Description  Get all todos
+// @Tags         crud todos
+// @Accept       */*
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /todos [get]
+func GetAllTodos(ctx *fiber.Ctx) error {
 	// Access the collection
 	collection := mgm.Coll(&models.ToDo{})
 	// Fetch all todos & store it in todos variable
@@ -16,162 +29,160 @@ func GetAllTodos(ctx *fiber.Ctx) {
 	// If there is an error, return the error
 	if err != nil {
 		ctx.Status(500).JSON(fiber.Map{
-			"ok": false,
-			// "error": "Server error",
-			"error": err.Error(),
+			"ok":      false,
+			"message": "SERVER ERROR",
+			"error":   err.Error(),
 		})
-		// TODO: Check why is return important here
-		return
 	}
 	// Otherwise, return the todos
-	ctx.JSON(fiber.Map{
+	return ctx.JSON(fiber.Map{
 		"ok":   true,
 		"data": todos,
 	})
 }
 
-func GetTodoByID(ctx *fiber.Ctx) {
+// GetTodoByID godoc
+// @Summary      Get todo by id
+// @Description  Get todo by id
+// @Tags         crud todos
+// @Accept       */*
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /todos/:id [get]
+func GetTodoByID(ctx *fiber.Ctx) error {
 	collection := mgm.Coll(&models.ToDo{})
 	todo := models.ToDo{}
 	err := collection.FindByID(ctx.Params("id"), &todo)
 	if err != nil {
-		ctx.Status(404).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Invalid ID",
-			// "error": err.Error(),
+		return ctx.Status(404).JSON(fiber.Map{
+			"ok":      false,
+			"message": "INVALID ID",
+			"error":   err.Error(),
 		})
-		return
 	}
-	ctx.JSON(fiber.Map{
+	return ctx.JSON(fiber.Map{
 		"ok":   true,
 		"data": todo,
 	})
 }
 
-func CreateTodo(ctx *fiber.Ctx) {
-	// Expected params structure
-	params := new(struct {
-		Title       string
-		Description string
-	})
+// CreateTodo godoc
+// @Summary      Create a todo
+// @Description  Create a todo. Provide title & description
+// @Tags         crud todos
+// @Accept       */*
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /todos [post]
+func CreateTodo(ctx *fiber.Ctx) error {
+	body := schema.ToDo{}
+
 	// Parse the body. Return 400 if there is an error
-	if err := ctx.BodyParser(&params); err != nil {
-		ctx.Status(400).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Cannot parse request",
-			// "error": err.Error(),
+	if err := ctx.BodyParser(&body); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"ok":      false,
+			"message": "CANNOT PARSE BODY",
+			"error":   err.Error(),
 		})
-		return
 	}
 
-	// Return 400 if title is empty
-	if params.Title == "" {
-		ctx.Status(400).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Title is required",
-		})
-		return
-	} else if params.Description == "" {
-		// Return 400 if description is empty
-		ctx.Status(400).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Description is required",
-		})
+	// Validate request body
+	errors := utils.ValidateStruct(body)
+	if errors != nil {
+		ctx.Status(fiber.StatusBadRequest).JSON(errors)
 	}
 
 	// Get collection
 	collection := mgm.Coll(&models.ToDo{})
 	// Create todo from request parameters
-	todo := models.CreateTodo(params.Title, params.Description)
+	todo := models.CreateTodo(body.Title, body.Description)
 	// Insert into collection
 	err := collection.Create(todo)
 	// Return 500 if there is an error
 	if err != nil {
-		ctx.Status(500).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Server error",
-			// "error": err.Error(),
+		return ctx.Status(500).JSON(fiber.Map{
+			"ok":      false,
+			"message": "SERVER ERRROR",
+			"error":   err.Error(),
 		})
-		return
 	}
 	// Return the created data otherwise
-	ctx.JSON(fiber.Map{
+	return ctx.JSON(fiber.Map{
 		"ok":   true,
-		"data": params,
+		"data": body,
 	})
 }
 
-func UpdateTodo(ctx *fiber.Ctx) {
+// UpdateTodo godoc
+// @Summary      Update a todo
+// @Description  Update a todo. Provide title, description & id
+// @Tags         crud todos
+// @Accept       */*
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /todos/:id [patch]
+func UpdateTodo(ctx *fiber.Ctx) error {
 	// Extract id from params
 	id := ctx.Params("id")
+	body := schema.ToDo{}
 
-	todo := models.ToDo{}
+	todoModel := models.ToDo{}
 	// Get collection
-	collection := mgm.Coll(&todo)
+	collection := mgm.Coll(&todoModel)
 	// Get todo by id
-	err := collection.FindByID(id, &todo)
+	err := collection.FindByID(id, &todoModel)
 	// If there is an error, return 404 (invalid id or not found)
 	if err != nil {
-		ctx.Status(404).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Invalid ID",
-			// "error": err.Error(),
+		return ctx.Status(404).JSON(fiber.Map{
+			"ok":      false,
+			"error":   "INVALID ID",
+			"message": err.Error(),
 		})
-		return
 	}
 
-	// Expected params structure
-	params := new(struct {
-		Title       string
-		Description string
-	})
 	// Parse the body. Return 400 if there is an error
-	if err := ctx.BodyParser(&params); err != nil {
-		ctx.Status(400).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Cannot parse request",
-			// "error": err.Error(),
+	if err := ctx.BodyParser(&body); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"ok":      false,
+			"error":   "CANNOT PARSE BODY",
+			"message": err.Error(),
 		})
-		return
 	}
 
-	// If title is empty, return 400
-	if params.Title == "" {
-		ctx.Status(400).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Title is required",
-		})
-		return
-	} else if params.Description == "" {
-		// If description is empty, return 400
-		ctx.Status(400).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Description is required",
-		})
-		return
+	// Validate request body
+	errors := utils.ValidateStruct(body)
+	if errors != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(errors)
 	}
 
 	// Update todo
-	todo.Title = params.Title
-	todo.Description = params.Description
+	todoModel.Title = body.Title
+	todoModel.Description = body.Description
 	// Update the todo
-	err = collection.Update(&todo)
+	err = collection.Update(&todoModel)
 	// Return 500 if there is an error
 	if err != nil {
-		ctx.Status(500).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Server error",
-			// "error": err.Error(),
+		return ctx.Status(500).JSON(fiber.Map{
+			"ok":      false,
+			"message": "SERVER ERROR",
+			"error":   err.Error(),
 		})
-		return
 	}
-	ctx.JSON(fiber.Map{
+	return ctx.JSON(fiber.Map{
 		"ok":   true,
-		"data": params,
+		"data": todoModel,
 	})
 }
 
-func DeleteTodo(ctx *fiber.Ctx) {
+// DeleteTodo godoc
+// @Summary      Delete a todo
+// @Description  Provide an id to delete a todo
+// @Tags         crud todos
+// @Accept       */*
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /todos/:id [delete]
+func DeleteTodo(ctx *fiber.Ctx) error {
 	// Extract id from params
 	id := ctx.Params("id")
 
@@ -182,23 +193,51 @@ func DeleteTodo(ctx *fiber.Ctx) {
 	err := collection.FindByID(id, &todo)
 	// If there is an error, return 404 (invalid id or not found)
 	if err != nil {
-		ctx.Status(404).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Invalid ID",
-			// "error": err.Error(),
+		return ctx.Status(404).JSON(fiber.Map{
+			"ok":      false,
+			"message": "INVALID ID",
+			"error":   err.Error(),
 		})
-		return
 	}
 
 	// Delete todo
 	err = collection.Delete(&todo)
 	// Return 500 if there is an error
 	if err != nil {
-		ctx.Status(500).JSON(fiber.Map{
-			"ok":    false,
-			"error": "Server error",
-			// "error": err.Error(),
+		return ctx.Status(500).JSON(fiber.Map{
+			"ok":      false,
+			"message": "SERVER ERROR",
+			"error":   err.Error(),
 		})
-		return
 	}
+	msg := fmt.Sprintf("Todo (%v) deleted ", ctx.Params("id"))
+	return ctx.SendString(msg)
+}
+
+// StatusVerification godoc
+// @Summary      Middlewares Chaining demonstration
+// @Description  Middleware chaining
+// @Tags         verification
+// @Accept       */*
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /verify/:status/:role [get]
+func StatusVerification(c *fiber.Ctx) error {
+	log.Println("Verifying user")
+	if c.Locals("isAuthenticated") == false {
+		return c.Status(403).SendString("Unauthenticated! Please sign up!")
+	}
+	return c.Status(302).SendString("Redirecting " + c.Locals("redirectRoute").(string))
+}
+
+// HealthCheck godoc
+// @Summary      Show the status of server.
+// @Description  Get the status of server.
+// @Tags         healthcheck
+// @Accept       */*
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       / [get]
+func HealthCheck(ctx *fiber.Ctx) error {
+	return ctx.Status(200).SendString("It's working!")
 }
