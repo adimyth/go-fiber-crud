@@ -6,11 +6,13 @@ A simple todo crud app.
 
 | Method | Endpoint     | Description    |
 | ------ | ------------ | -------------- |
-| GET    | `/todos`     | Get all todos  |
-| GET    | `/todos/:id` | Get todo by id |
-| POST   | `/todos`     | Create todo    |
-| DELETE | `/todos/:id` | Delete todo    |
-| PUT    | `/todos/:id` | Update todo    |
+| GET    | `/api/todos`     | Get all todos  |
+| GET    | `/api/todos/:id` | Get todo by id |
+| POST   | `/api/todos`     | Create todo    |
+| DELETE | `/api/todos/:id` | Delete todo    |
+| PUT    | `/api/todos/:id` | Update todo    |
+| GET    | `/` | HealthCheck    |
+| GET    | `/static/golang.png` | Static File Access Example   |
 
 1. `models/Todo.go` contains model definition
 2. `controllers/Todo.go` contains the app logic

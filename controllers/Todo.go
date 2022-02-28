@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/Kamva/mgm/v2"
 	"github.com/adimyth/go-fiber-crud/models"
@@ -93,7 +92,7 @@ func CreateTodo(ctx *fiber.Ctx) error {
 	// Validate request body
 	errors := utils.ValidateStruct(body)
 	if errors != nil {
-		ctx.Status(fiber.StatusBadRequest).JSON(errors)
+		return ctx.Status(fiber.StatusBadRequest).JSON(errors)
 	}
 
 	// Get collection
@@ -219,34 +218,4 @@ func DeleteTodo(ctx *fiber.Ctx) error {
 	}
 	msg := fmt.Sprintf("Todo (%v) deleted ", ctx.Params("id"))
 	return ctx.SendString(msg)
-}
-
-// StatusVerification godoc
-// @Summary      Middlewares Chaining demonstration
-// @Description  Middleware chaining
-// @Tags         verification
-// @Accept       json
-// @Produce      json
-// @Param		status path string true "authenticated / not authenticated"
-// @Param		role path string true "admin / user / guest"
-// @Success      200  {object}  map[string]interface{}
-// @Router       /verify/:status/:role [get]
-func StatusVerification(c *fiber.Ctx) error {
-	log.Println("Verifying user")
-	if c.Locals("isAuthenticated") == false {
-		return c.Status(403).SendString("Unauthenticated! Please sign up!")
-	}
-	return c.Status(302).SendString("Redirecting " + c.Locals("redirectRoute").(string))
-}
-
-// HealthCheck godoc
-// @Summary      Show the status of server.
-// @Description  Get the status of server.
-// @Tags         healthcheck
-// @Accept       json
-// @Produce      json
-// @Success      200  {object}  map[string]interface{}
-// @Router       / [get]
-func HealthCheck(ctx *fiber.Ctx) error {
-	return ctx.Status(200).SendString("It's working!")
 }

@@ -7,8 +7,12 @@ import (
 	"github.com/adimyth/go-fiber-crud/controllers"
 	_ "github.com/adimyth/go-fiber-crud/docs"
 	"github.com/adimyth/go-fiber-crud/middlewares"
+	"github.com/adimyth/go-fiber-crud/routes"
+	_ "github.com/adimyth/go-fiber-crud/routes"
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -37,16 +41,14 @@ func init() {
 // @schemes   http
 func main() {
 	app := fiber.New()
+	app.Use(logger.New())
+	app.Get("/dashboard", monitor.New())
 
 	// HealthCheck
 	app.Get("/", controllers.HealthCheck)
 
-	// CRUD operations
-	app.Get("/todos", controllers.GetAllTodos)
-	app.Get("/todos/:id", controllers.GetTodoByID)
-	app.Post("/todos", controllers.CreateTodo)
-	app.Patch("/todos/:id", controllers.UpdateTodo)
-	app.Delete("/todos/:id", controllers.DeleteTodo)
+	// Routes
+	routes.SetupRoutes(app)
 
 	// Authentication & Authorization Middlewares
 	app.Get("/verify/:status/:role", middlewares.Authenticate, middlewares.Authorize, controllers.StatusVerification)
@@ -55,6 +57,9 @@ func main() {
 	app.Static("/static", "./public")
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
+
+	// Download a file
+	app.Get("/download", controllers.DownloadFile)
 
 	app.Listen(":3000")
 }
