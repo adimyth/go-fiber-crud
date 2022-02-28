@@ -4,17 +4,18 @@
 
 A simple todo crud app.
 
-| Method | Endpoint     | Description    |
-| ------ | ------------ | -------------- |
-| GET    | `/api/todos`     | Get all todos  |
-| GET    | `/api/todos/:id` | Get todo by id |
-| POST   | `/api/todos`     | Create todo    |
-| DELETE | `/api/todos/:id` | Delete todo    |
-| PUT    | `/api/todos/:id` | Update todo    |
-| GET    | `/` | HealthCheck    |
-| GET    | `/static/golang.png` | Static File Access Example   |
+| Method | Endpoint             | Description                |
+| ------ | -------------------- | -------------------------- |
+| GET    | `/api/todos`         | Get all todos              |
+| GET    | `/api/todos/:id`     | Get todo by id             |
+| POST   | `/api/todos`         | Create todo                |
+| DELETE | `/api/todos/:id`     | Delete todo                |
+| PUT    | `/api/todos/:id`     | Update todo                |
+| GET    | `/`                  | HealthCheck                |
+| GET    | `/static/golang.png` | Static File Access Example |
 
 ## Project Structure
+
 1. **controllers** - contains the app logic
 2. **docs** - contains auto generated swagger documentation
 3. **middlewares** - contains custom middlewares
@@ -166,7 +167,7 @@ func main() {
 
 7. Open swagger documentation in browser - [swagger docs](http://localhost:3000/swagger)
 
-
+<img width="1512" alt="Screenshot 2022-02-27 at 3 24 46 PM" src="https://user-images.githubusercontent.com/26377913/155877686-3d96cc0a-6421-4f00-a729-374bf4323ad8.png">
 
 ## DB Setup
 
