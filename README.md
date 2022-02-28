@@ -14,8 +14,15 @@ A simple todo crud app.
 | GET    | `/` | HealthCheck    |
 | GET    | `/static/golang.png` | Static File Access Example   |
 
-1. `models/Todo.go` contains model definition
-2. `controllers/Todo.go` contains the app logic
+## Project Structure
+1. **controllers** - contains the app logic
+2. **docs** - contains auto generated swagger documentation
+3. **middlewares** - contains custom middlewares
+4. **models** - contains model definition
+5. **public** - contains static files
+6. **routes** - contains app routes
+7. **schema** - contains app schema
+8. **utils** - contains utility functions. contains `validators` for schema validation
 
 ## Dependencies
 
